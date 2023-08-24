@@ -166,7 +166,7 @@ jobs:
           password: '${{ secrets.WINDOWS_PFX_PASSWORD }}'
           certificatesha1: '${{ secrets.WINDOWS_PFX_SHA1_THUMBPRINT }}'
           # certificatename: '${{ secrets.CERTNAME }}'
-          folder: './target/x86_64-pc-windows-msvc/release'
+          folder: './SignOutput/'
           recursive: true
 
       - name: Archive release
@@ -175,7 +175,9 @@ jobs:
         with:
           type: 'zip'
           filename: '${{ env.PROG_NAME }}-${{ matrix.job.gui }}-${{ matrix.job.target }}.zip'
-          exclusions: '*.git* /*node_modules/* .editorconfig'     
+          exclusions: '*.git* /*node_modules/* .editorconfig'
+          directory: './SignOutput/'
+          path: '.'
 
       - name: Publish Release
         continue-on-error: true
