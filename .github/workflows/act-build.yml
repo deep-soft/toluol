@@ -6,6 +6,11 @@ on:
 #  pull_request:
 #    branches: [ "main" ]
   workflow_dispatch:
+    inputs:
+      archive_all:
+        description: archive all
+        type: boolean
+        default: false
 
 env:
   CARGO_TERM_COLOR: always
@@ -141,6 +146,7 @@ jobs:
         run: cargo build --verbose --release
 
       - name: copy release
+        continue-on-error: true
         shell: bash
         run: |
           mkdir ./SignOutput
@@ -153,6 +159,7 @@ jobs:
 
       - name: Sign files
         if: ${{ env.sign_exe }}
+        continue-on-error: true        
         uses: deep-soft/code-sign-action@master
         with:
           certificate: '${{ secrets.WINDOWS_PFX_BASE64 }}'
@@ -170,6 +177,24 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           files: |
             ./SignOutput/*
-      
+
+      - name: Archive ALL
+        if: ${{ inputs.archive_all }}
+        continue-on-error: true
+        uses: deep-soft/zip-release@v2
+        with:
+          type: 'zip'
+          filename: '${{ env.PROG_NAME }}-${{ matrix.job.gui }}-ALL.zip'
+          exclusions: '*.git* /*node_modules/* .editorconfig'      
+
+      - name: Publish Release
+        continue-on-error: true
+        uses: deep-soft/action-gh-release@v1
+        with:
+          draft: true
+          tag_name: ${{ env.TAG_NAME }}
+          files: |
+            ${{ env.ZIP_RELEASE_ARCHIVE }}
+
       - name: Run tests
         run: cargo test --verbose
