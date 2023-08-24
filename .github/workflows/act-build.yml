@@ -27,7 +27,7 @@ jobs:
       matrix:
         job:
           - { arch: x86_64, target: x86_64-unknown-linux-gnu  , os: ubuntu-20.04, gui: Lin }
-          - { arch: x86_64, target: x86_64-pc-windows-msvc    , os: windows-2022, gui: win }
+          - { arch: x86_64, target: x86_64-pc-windows-msvc    , os: windows-2022, gui: Win }
     steps:
       - name: Checkout source code
         uses: deep-soft/checkout@v3
@@ -140,6 +140,17 @@ jobs:
       - name: Build
         run: cargo build --verbose --release
 
+      - name: copy release
+        shell: bash
+        run: |
+          mkdir ./SignOutput
+          exe_ext=''
+          if [[ matrix.job.gui == 'Win' ]]; then
+            exe_ext='.exe'
+          fi
+          cp ./target/${{ matrix.job.target }}/release/${{ env.PROG_NAME }}$exe_ext ./SignOutput/
+          ls -l ./SignOutput/
+
       - name: Sign files
         if: ${{ env.sign_exe }}
         uses: deep-soft/code-sign-action@master
@@ -159,7 +170,6 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           files: |
             ./SignOutput/*
-            ${{ env.ASSET_SRC }}
       
       - name: Run tests
         run: cargo test --verbose
