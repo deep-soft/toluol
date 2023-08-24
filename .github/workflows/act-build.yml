@@ -123,7 +123,7 @@ jobs:
         uses: deep-soft/action-gh-release@v1
         with:
           draft: true
-          tag_name: ${{ env.TAG_NAME }}
+          tag_name: ${{ env.TAG_VERSION }}
           files: |
             ${{ env.ASSET_SRC }}
 
