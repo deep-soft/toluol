@@ -174,7 +174,7 @@ jobs:
         uses: deep-soft/zip-release@v2
         with:
           type: 'zip'
-          filename: '${{ env.PROG_NAME }}-${{ matrix.job.gui }}-${{ matrix.job.target }}.zip'
+          filename: '${{ env.PROG_NAME }}-${{ env.PROG_VERSION }}-${{ matrix.job.gui }}-${{ matrix.job.target }}.zip'
           exclusions: '*.git* /*node_modules/* .editorconfig'
           directory: './SignOutput/'
           path: '.'
