@@ -184,7 +184,7 @@ jobs:
         continue-on-error: true
         uses: deep-soft/action-gh-release@v1
         with:
-          draft: true
+          # draft: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
             ${{ env.ZIP_RELEASE_ARCHIVE }}
@@ -213,7 +213,7 @@ jobs:
         uses: deep-soft/action-gh-release@v1
         with:
           draft: true
-          tag_name: ${{ env.TAG_NAME }}
+          tag_name: ${{ env.TAG_NAME }}-ALL
           files: |
             ${{ env.ZIP_RELEASE_ARCHIVE }}
 
