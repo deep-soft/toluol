@@ -15,24 +15,24 @@ on:
 env:
   CARGO_TERM_COLOR: always
   TAG_NAME: "toluol"
-  TAG_VERSION:   "toluol-v2.0.0"
+  TAG_VERSION:   "toluol-v1.0.0"
   TAG_BUILD:     "-b"
   TAG_REF:       "0000000"
   PROG_NAME:     "toluol"
-  PROG_VERSION:  "v2.0.0"
-  VERSION:       "2.0.0"
+  PROG_VERSION:  "v1.0.0"
+  VERSION:       "1.0.0"
   DEBUG_LS:      "yes"
 
 jobs:
   build:
-    name: ${{ matrix.job.target }} (${{ matrix.job.os }})
+    name: ${{ matrix.job.gui }} ${{ matrix.job.os }} (${{ matrix.job.target }} )
     runs-on: ${{ matrix.job.os }}
     strategy:
       fail-fast: false
       matrix:
         job:
-          - { arch: x86_64, target: x86_64-unknown-linux-gnu  , os: ubuntu-20.04, gui: Lin }
-          - { arch: x86_64, target: x86_64-pc-windows-msvc    , os: windows-2022, gui: Win }
+          - { gui: Lin, arch: x86_64, target: x86_64-unknown-linux-gnu  , os: ubuntu-20.04 }
+          - { gui: Win, arch: x86_64, target: x86_64-pc-windows-msvc    , os: windows-2022 }
     steps:
       - name: Checkout source code
         uses: deep-soft/checkout@v3
@@ -154,7 +154,7 @@ jobs:
           if [[ matrix.job.gui == 'Win' ]]; then
             exe_ext='.exe'
           fi
-          cp ./target/${{ matrix.job.target }}/release/${{ env.PROG_NAME }}$exe_ext ./SignOutput/
+          cp ./target/release/${{ env.PROG_NAME }}$exe_ext ./SignOutput/
           ls -l ./SignOutput/
 
       - name: Sign files
@@ -169,6 +169,14 @@ jobs:
           folder: './target/x86_64-pc-windows-msvc/release'
           recursive: true
 
+      - name: Archive release
+        continue-on-error: true
+        uses: deep-soft/zip-release@v2
+        with:
+          type: 'zip'
+          filename: '${{ env.PROG_NAME }}-${{ matrix.job.gui }}-${{ matrix.job.target }}.zip'
+          exclusions: '*.git* /*node_modules/* .editorconfig'     
+
       - name: Publish Release
         continue-on-error: true
         uses: deep-soft/action-gh-release@v1
@@ -176,7 +184,7 @@ jobs:
           draft: true
           tag_name: ${{ env.TAG_NAME }}
           files: |
-            ./SignOutput/*
+            ${{ env.ZIP_RELEASE_ARCHIVE }}
 
       - name: Archive ALL
         if: ${{ inputs.archive_all }}
@@ -187,7 +195,8 @@ jobs:
           filename: '${{ env.PROG_NAME }}-${{ matrix.job.gui }}-ALL.zip'
           exclusions: '*.git* /*node_modules/* .editorconfig'      
 
-      - name: Publish Release
+      - name: Publish archive ALL
+        if: ${{ inputs.archive_all }}
         continue-on-error: true
         uses: deep-soft/action-gh-release@v1
         with:
