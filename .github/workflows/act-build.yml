@@ -174,7 +174,8 @@ jobs:
         uses: deep-soft/zip-release@v2
         with:
           type: 'zip'
-          filename: '${{ env.PROG_NAME }}-${{ env.PROG_VERSION }}-${{ matrix.job.gui }}-${{ matrix.job.target }}.zip'
+          # filename: '${{ env.PROG_NAME }}-${{ env.PROG_VERSION }}-${{ matrix.job.gui }}-${{ matrix.job.target }}.zip'
+          filename: '${{ env.PROG_NAME }}-${{ env.PROG_VERSION }}-${{ matrix.job.gui }}.zip'
           exclusions: '*.git* /*node_modules/* .editorconfig'
           directory: './SignOutput/'
           path: '.'
@@ -185,6 +186,15 @@ jobs:
         with:
           draft: true
           tag_name: ${{ env.TAG_NAME }}
+          files: |
+            ${{ env.ZIP_RELEASE_ARCHIVE }}
+
+      - name: Publish Release version
+        continue-on-error: true
+        uses: deep-soft/action-gh-release@v1
+        with:
+          draft: true
+          tag_name: ${{ env.TAG_VERSION }}
           files: |
             ${{ env.ZIP_RELEASE_ARCHIVE }}
 
